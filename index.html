@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financing Calculator</title>
+
+<style>
+body {
+  background: #000;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  color: #e5e5e5;
+}
+
+.calc-shift {
+  --shift-x: 0px;
+  transform: translateX(var(--shift-x));
+}
+
+#financing-calculator {
+  width: 100%;
+  padding: 24px;
+  border-radius: 12px;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: #e5e5e5;
+}
+
+#financing-calculator input,
+#financing-calculator select,
+#financing-calculator button,
+#results {
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.calc-row {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  flex-wrap: nowrap;
+  margin-bottom: 20px;
+}
+
+#financing-calculator label {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.calc-title {
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000;
+  margin: 0 0 6px;
+}
+
+.calc-button-title {
+  text-align: center;
+  color: #8CC63F;
+}
+
+#financing-calculator input,
+#financing-calculator select {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border-radius: 6px;
+  border: 1px solid #2A2A2A;
+  background: #111;
+  color: #e5e5e5;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+#financing-calculator input::placeholder {
+  color: #666;
+}
+
+#financing-calculator input:focus,
+#financing-calculator select:focus {
+  border-color: #8CC63F;
+  box-shadow: 0 0 6px #8CC63F;
+  outline: none;
+}
+
+#financing-calculator button {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 20px;
+  background: #111;
+  border: 1px solid #2A2A2A;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+#financing-calculator button:hover {
+  background: #0A0A0A;
+  box-shadow: 0 0 8px #8CC63F;
+}
+
+#financing-calculator button:active {
+  transform: translateY(2px);
+  background: #000;
+}
+
+#results {
+  background: #111;
+  border: 1px solid #2A2A2A;
+  border-radius: 6px;
+  padding: 16px;
+  color: #e5e5e5;
+}
+
+#results strong {
+  color: #8CC63F;
+}
+
+.disclaimer {
+  font-size: 0.75rem;
+  color: #777;
+  margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+  .calc-row {
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 16px;
+  }
+
+  #financing-calculator input,
+  #financing-calculator select {
+    width: 100% !important;
+    font-size: 1rem;
+    padding: 12px;
+  }
+
+  #financing-calculator button {
+    padding: 16px;
+    font-size: 1.1rem;
+  }
+
+  #results {
+    padding: 14px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="calc-shift">
+<div id="financing-calculator">
+
+  <div class="calc-row">
+
+    <label>
+      <h4 class="calc-title">Purchase Amount ($)</h4>
+      <input type="number" id="purchaseAmount" placeholder="ex. $10,000" min="100" step="100">
+    </label>
+
+    <label>
+      <h4 class="calc-title">Term Length</h4>
+      <select id="amortizationPeriod">
+        <option value="60" selected>60 months</option>
+      </select>
+    </label>
+
+    <label>
+      <h4 class="calc-title">Program</h4>
+      <select id="program">
+        <option value="12|0" selected>12 months at 0.00%</option>
+      </select>
+    </label>
+
+    <label>
+      <h4 class="calc-title">Payment Frequency</h4>
+      <select id="frequency">
+        <option value="monthly" selected>Monthly</option>
+        <option value="biweekly">Bi-Weekly</option>
+        <option value="weekly">Weekly</option>
+      </select>
+    </label>
+
+  </div>
+
+  <button onclick="calculatePayment()">
+    <h4 class="calc-title calc-button-title">Calculate</h4>
+  </button>
+
+  <div id="results">
+    <p><strong>Payment Over Full Period (with interest):</strong> $<span id="fullPeriodPayment">0.00</span></p>
+    <p><strong>Payment Within Deferral Period (0%):</strong> $<span id="deferralPayment">0.00</span></p>
+    <p class="disclaimer">
+      * Estimates only. Actual financing terms depend on credit approval.
+    </p>
+  </div>
+
+</div>
+</div>
+
+<script>
+const CONFIG = {
+  partnerCostRate: 6.99
+};
+
+function calculatePayment() {
+  const amount = parseFloat(document.getElementById('purchaseAmount').value);
+  if (isNaN(amount) || amount <= 0) {
+    alert("Please enter a valid purchase amount.");
+    return;
+  }
+
+  const months = parseInt(document.getElementById('amortizationPeriod').value);
+  const programParts = document.getElementById('program').value.split("|");
+  const deferralMonths = parseInt(programParts[0]);
+  const annualRate = parseFloat(programParts[1]);
+  const frequency = document.getElementById('frequency').value;
+
+  const financedAmount = amount * (1 + CONFIG.partnerCostRate / 100);
+
+  let paymentsPerYear;
+  if (frequency === "monthly") paymentsPerYear = 12;
+  else if (frequency === "biweekly") paymentsPerYear = 26;
+  else if (frequency === "weekly") paymentsPerYear = 52;
+
+  const deferralPayments = (deferralMonths / 12) * paymentsPerYear;
+  const deferralPayment = financedAmount / deferralPayments;
+
+  const totalPayments = (months / 12) * paymentsPerYear;
+  const periodicRate = annualRate / paymentsPerYear / 100;
+
+  let fullPeriodPayment;
+  if (annualRate === 0) {
+    fullPeriodPayment = financedAmount / totalPayments;
+  } else {
+    fullPeriodPayment = (financedAmount * periodicRate) /
+      (1 - Math.pow(1 + periodicRate, -totalPayments));
+  }
+
+  document.getElementById('fullPeriodPayment').innerText = fullPeriodPayment.toFixed(2);
+  document.getElementById('deferralPayment').innerText = deferralPayment.toFixed(2);
+}
+</script>
+
+</body>
+</html>
