@@ -25,6 +25,7 @@ body {
   color: #e5e5e5;
 }
 
+/* Titles */
 .calc-title {
   font-size: 1.1rem;
   font-weight: 600;
@@ -32,14 +33,7 @@ body {
   margin: 0 0 6px;
 }
 
-.calc-button-title {
-  text-align: center;
-  color: #8CC63F;
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin-left: 8px;
-}
-
+/* Desktop row layout */
 .calc-row {
   display: flex;
   flex-direction: row;
@@ -47,6 +41,7 @@ body {
   margin-bottom: 20px;
 }
 
+/* Force all 4 inputs to be identical */
 #financing-calculator label {
   display: flex;
   flex-direction: column;
@@ -57,7 +52,7 @@ body {
 #financing-calculator input,
 #financing-calculator select {
   width: 100%;
-  height: 48px;
+  height: 52px;
   padding: 10px;
   margin-top: 6px;
   border-radius: 6px;
@@ -65,27 +60,23 @@ body {
   background: #111111;
   color: #e5e5e5;
   box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  font-size: 1rem;
 }
 
 #purchaseAmount {
   text-overflow: ellipsis;
 }
 
-#financing-calculator input::placeholder {
-  color: #666;
-}
-
 #financing-calculator input:focus,
 #financing-calculator select:focus {
   border-color: #8CC63F;
-  box-shadow: 0 0 6px #8CC63F;
   outline: none;
 }
 
-/* Custom Calculate Button */
+/* Calculate Button (styled like your Apply Now example) */
 #financing-calculator button {
   width: 100%;
-  padding: 14px;
+  padding: 16px;
   margin-bottom: 20px;
   background: #161b0e;
   border: none;
@@ -94,17 +85,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  transition: background 0.2s ease, transform 0.1s ease;
 }
 
 #financing-calculator button:hover {
   background: #1f2812;
-  box-shadow: 0 0 8px #8CC63F;
 }
 
 #financing-calculator button:active {
   transform: translateY(2px);
-  background: #000000;
 }
 
 .calc-icon {
@@ -113,29 +102,38 @@ body {
   background-image: url('https://img.icons8.com/ios-filled/50/8CC63F/calculator.png');
   background-size: contain;
   background-repeat: no-repeat;
-  margin-right: 8px;
+  margin-right: 10px;
 }
 
-/* Results Text */
-#results p {
+.calc-button-title {
+  color: #8CC63F;
   font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Results text (no box) */
+#results p {
+  font-size: 1.25rem;
   margin-bottom: 10px;
 }
 
-#results .disclaimer {
+#results strong {
+  color: #8CC63F;
+}
+
+.disclaimer {
   font-size: 0.75rem;
   color: #777;
   margin-top: 10px;
 }
 
+/* Mobile layout */
 @media (max-width: 768px) {
   body {
     padding: 20px;
   }
 
   #financing-calculator {
-    width: 100%;
-    max-width: 100%;
     padding: 16px;
   }
 
@@ -146,18 +144,12 @@ body {
 
   #financing-calculator input,
   #financing-calculator select {
+    height: 56px;
     font-size: 1rem;
-    height: 52px;
-    padding: 12px;
-  }
-
-  #financing-calculator button {
-    padding: 16px;
-    font-size: 1.1rem;
   }
 
   #results p {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 }
 </style>
@@ -201,7 +193,7 @@ body {
 
   <button onclick="calculatePayment()">
     <div class="calc-icon"></div>
-    <h4 class="calc-title calc-button-title">Calculate</h4>
+    <div class="calc-button-title">Calculate</div>
   </button>
 
   <div id="results">
